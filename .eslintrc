@@ -1,0 +1,27 @@
+{
+	"env": {
+		"browser": true,
+		"es6": true
+	},
+	"extends": ["eslint:recommended"],
+	"parserOptions": {
+		"ecmaVersion": 2015
+	},
+	"rules": {
+		"arrow-parens": "off",
+		"block-scoped-var": "off",
+		"no-console": "warn",
+		"no-plusplus": "off",
+		"no-redeclare": "off",
+		"no-use-before-define": [
+			"error",
+			{
+				"classes": false,
+				"functions": false
+			}
+		],
+		"no-var": 0,
+		"prefer-template": 0,
+		"vars-on-top": 0
+	}
+}

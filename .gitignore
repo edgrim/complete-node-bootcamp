@@ -1,0 +1,14 @@
+# OS
+**/.DS_Store
+
+# Editor
+.vscode/
+
+# Generate output
+dist/
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Dependency directories
+node_modules/
