@@ -1,0 +1,6 @@
+{
+  rules: {},
+  ignoreFiles: [
+    '**/*.js'
+  ]
+}
