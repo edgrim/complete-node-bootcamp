@@ -38,24 +38,26 @@
 // !SECTION: Files
 
 // SECTION: Server
-const replaceTemplate = (template, product) => {
-	let output = template.replace(/{%ID%}/g, product.id);
+const http = require('http');
+const fs = require('fs');
+const url = require('url');
+
+const replaceTemplate = (template, data) => {
+	let output = template.replace(/{%ID%}/g, data.id);
 	output = output
-		.replace(/{%PRODUCT_NAME%}/g, product.productName)
-		.replace(/{%IMAGE%}/g, product.image)
-		.replace(/{%FROM%}/g, product.from)
-		.replace(/{%NUTRIENTS%}/g, product.nutrients)
-		.replace(/{%QUANTITY%}/g, product.quantity)
-		.replace(/{%PRICE%}/g, product.price)
-		.replace(/{%NOT_ORGANIC%}/g, product.organic ? '' : 'not-organic')
-		.replace(/{%DESCRIPTION%}/g, product.description);
+		.replace(/{%PRODUCT_NAME%}/g, data.productName)
+		.replace(/{%IMAGE%}/g, data.image)
+		.replace(/{%FROM%}/g, data.from)
+		.replace(/{%NUTRIENTS%}/g, data.nutrients)
+		.replace(/{%QUANTITY%}/g, data.quantity)
+		.replace(/{%PRICE%}/g, data.price)
+		.replace(/{%NOT_ORGANIC%}/g, data.organic ? '' : 'not-organic')
+		.replace(/{%DESCRIPTION%}/g, data.description);
 
 	return output;
 };
 
-const http = require('http');
-const fs = require('fs');
-
+//  TODO: Convert to object and add replaceTemplate() as method
 const tempOverview = fs.readFileSync(
 	`${__dirname}/templates/template-overview.html`,
 	'utf-8'
@@ -70,43 +72,37 @@ const tempProduct = fs.readFileSync(
 );
 
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
-const dataObject = JSON.parse(data);
+const dataObj = JSON.parse(data);
 
 const server = http.createServer((req, res) => {
-	const pathName = req.url;
+	const { query, pathname } = url.parse(req.url, true);
 
 	// Overview page
-	if (pathName === '/overview') {
-		res.writeHead(200, {
-			ContentType: 'text/html'
-		});
-
-		const cardsHtml = dataObject
+	if (pathname === '/overview') {
+		const cardsHtml = dataObj
 			.map((el) => replaceTemplate(tempCard, el))
 			.join('');
-
-		console.log(typeof cardsHtml);
 
 		const finalOverviewPage = tempOverview.replace(
 			'{%PRODUCT_CARDS%}',
 			cardsHtml
 		);
 
+		res.writeHead(200, { 'Content-Type': 'text/html' });
 		res.end(finalOverviewPage);
 
 		// Product page
-	} else if (pathName === '/product') {
-		res.end('Product');
+	} else if (pathname === '/product') {
+		const productData = dataObj[query.id];
+		const productPage = replaceTemplate(tempProduct, productData);
+
+		res.writeHead(200, { 'Content-type': 'text-html' });
+		res.end(productPage);
 
 		// API
-	} else if (pathName === '/api') {
-		fs.readFile(`${__dirname}/dev-data/data.json`, 'utf-8', (err, data) => {
-			if (err) console.error(err);
-			res.writeHead(200, {
-				'Content-type': 'application/json'
-			});
-			res.end(data);
-		});
+	} else if (pathname === '/api') {
+		res.writeHead(200, { 'Content-type': 'application/json' });
+		res.end(data);
 
 		// Not found
 	} else {
