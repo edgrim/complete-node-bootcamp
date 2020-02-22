@@ -39,7 +39,6 @@
 
 // SECTION: Server
 const http = require('http');
-// const url = require('url');
 
 const server = http.createServer((req, res) => {
 	const pathName = req.url;
@@ -54,7 +53,7 @@ const server = http.createServer((req, res) => {
 			'Content-type': 'text/html',
 			'my-header': 'hello-world'
 		});
-		res.end('Fallback');
+		res.end('<h1>Error title</h1>');
 	}
 });
 
