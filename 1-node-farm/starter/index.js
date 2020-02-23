@@ -38,10 +38,14 @@
 // !SECTION: Files
 
 // SECTION: Server
+
+//Core packages
 const http = require('http');
 const fs = require('fs');
 const url = require('url');
-
+// NPM packages
+const slugify = require('slugify');
+// Custom pachakges
 const replaceTemplate = require('./modules/replaceTemplate');
 
 //  TODO: Convert to object and add replaceTemplate() as method
@@ -60,6 +64,10 @@ const tempProduct = fs.readFileSync(
 
 const data = fs.readFileSync(`${__dirname}/dev-data/data.json`, 'utf-8');
 const dataObj = JSON.parse(data);
+
+const slugs = dataObj.map((el) => {
+	return slugify(el.productName, { lower: true });
+});
 
 const server = http.createServer((req, res) => {
 	const { query, pathname } = url.parse(req.url, true);
